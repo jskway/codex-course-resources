@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Codex Demo",
-  description: "A Codex Demo App",
+  title: "TinyNotes",
+  description: "A tiny private notes app with public sharing.",
 };
 
 export default function RootLayout({
