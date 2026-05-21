@@ -36,10 +36,8 @@ const authCopy: Record<
 
 export function AuthPage({ mode }: { mode: AuthMode }) {
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-background px-6 py-12 text-foreground">
-      <div className="mx-auto flex min-h-[calc(100vh-10rem)] max-w-5xl flex-col justify-center">
-        <AuthPanel mode={mode} />
-      </div>
+    <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-background px-6 py-12 text-foreground">
+      <AuthPanel mode={mode} />
     </main>
   );
 }
@@ -48,17 +46,17 @@ export function AuthPanel({ mode }: { mode: AuthMode }) {
   const copy = authCopy[mode];
 
   return (
-    <section className="w-full max-w-md rounded-lg border border-acc-2 bg-white/80 p-8 shadow-sm">
+    <section className="w-full max-w-md rounded-lg border border-acc-2 bg-acc-1/80 p-8 shadow-xl shadow-black/10">
       <p className="text-sm font-medium text-acc-4">{copy.eyebrow}</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-acc-5">{copy.title}</h1>
-      <p className="mt-4 text-base leading-7 text-slate-700">{copy.description}</p>
+      <p className="mt-4 text-base leading-7 text-foreground/75">{copy.description}</p>
 
       <form className="mt-8 space-y-5">
         <label className="block text-sm font-medium text-foreground">
           Email
           <input
             autoComplete="email"
-            className="mt-2 w-full rounded-md border border-acc-2 bg-white px-3 py-2 text-base text-foreground shadow-sm outline-none transition focus:border-acc-4 focus:ring-2 focus:ring-acc-2"
+            className="mt-2 w-full rounded-md border border-acc-2 bg-background px-3 py-2 text-base text-foreground shadow-sm outline-none transition placeholder:text-foreground/40 focus:border-acc-4 focus:ring-2 focus:ring-acc-2"
             name="email"
             placeholder="you@example.com"
             type="email"
@@ -69,14 +67,14 @@ export function AuthPanel({ mode }: { mode: AuthMode }) {
           Password
           <input
             autoComplete={mode === "login" ? "current-password" : "new-password"}
-            className="mt-2 w-full rounded-md border border-acc-2 bg-white px-3 py-2 text-base text-foreground shadow-sm outline-none transition focus:border-acc-4 focus:ring-2 focus:ring-acc-2"
+            className="mt-2 w-full rounded-md border border-acc-2 bg-background px-3 py-2 text-base text-foreground shadow-sm outline-none transition focus:border-acc-4 focus:ring-2 focus:ring-acc-2"
             name="password"
             type="password"
           />
         </label>
 
         <button
-          className="w-full rounded-md bg-acc-4 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-acc-5 focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2"
+          className="w-full rounded-md bg-acc-3 px-4 py-2.5 text-sm font-semibold text-background shadow-sm transition hover:bg-acc-4 focus:outline-none focus:ring-2 focus:ring-acc-4 focus:ring-offset-2 focus:ring-offset-background"
           type="button"
         >
           {copy.submitLabel}
@@ -84,9 +82,9 @@ export function AuthPanel({ mode }: { mode: AuthMode }) {
       </form>
 
       <div className="mt-6 space-y-3 text-center">
-        <p className="text-sm text-slate-700">{copy.switchPrompt}</p>
+        <p className="text-sm text-foreground/70">{copy.switchPrompt}</p>
         <Link
-          className="block w-full rounded-md border border-acc-2 bg-acc-1 px-4 py-2.5 text-sm font-semibold text-acc-5 shadow-sm transition hover:border-acc-3 hover:bg-white focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2"
+          className="block w-full rounded-md border border-acc-2 bg-background px-4 py-2.5 text-sm font-semibold text-acc-5 shadow-sm transition hover:border-acc-3 hover:bg-acc-2 focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2 focus:ring-offset-background"
           href={copy.switchHref}
         >
           {copy.switchLabel}
