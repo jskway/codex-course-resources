@@ -1,26 +1,27 @@
+import { notFound } from "next/navigation";
+import { getNoteForUser } from "@/lib/notes";
+import { requireSession } from "@/lib/session";
+import { NoteEditor } from "../note-editor";
+
 export default async function NoteDetailPage({
   params,
 }: Readonly<{
   params: Promise<{ id: string }>;
 }>) {
+  const session = await requireSession();
   const { id } = await params;
+  const note = getNoteForUser(session.user.id, id);
+
+  if (note === null) {
+    notFound();
+  }
 
   return (
-    <section className="rounded-lg border border-acc-2 bg-acc-1/80 p-6 shadow-sm">
-      <p className="text-sm font-medium text-acc-4">Authenticated route</p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-acc-5">
-        Dummy note detail page
-      </h2>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-foreground/75">
-        Placeholder for the future note editor and share controls. No ownership check, note fetch,
-        editor logic, or sharing behavior has been implemented.
-      </p>
-      <div className="mt-6 rounded-lg border border-acc-2 bg-acc-1/70 p-4 text-sm text-acc-5">
-        Dummy route parameter: {id}
-      </div>
-      <div className="mt-8 min-h-56 rounded-lg border border-dashed border-acc-3 bg-acc-1/70 p-5 text-sm text-foreground/75">
-        Dummy editor and share controls surface
-      </div>
-    </section>
+    <NoteEditor
+      initialContentJson={note.contentJson}
+      initialTitle={note.title}
+      mode="edit"
+      noteId={note.id}
+    />
   );
 }

@@ -26,3 +26,46 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
+
+.tinynotes-editor .ProseMirror {
+  min-height: 24rem;
+  outline: none;
+}
+
+.tinynotes-editor .ProseMirror > * + * {
+  margin-top: 0.875rem;
+}
+
+.tinynotes-editor .ProseMirror h2 {
+  color: var(--acc-5);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.tinynotes-editor .ProseMirror ul,
+.tinynotes-editor .ProseMirror ol {
+  padding-left: 1.5rem;
+}
+
+.tinynotes-editor .ProseMirror ul {
+  list-style: disc;
+}
+
+.tinynotes-editor .ProseMirror ol {
+  list-style: decimal;
+}
+
+.tinynotes-editor .ProseMirror blockquote {
+  border-left: 3px solid var(--acc-3);
+  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+  padding-left: 1rem;
+}
+
+.tinynotes-editor .ProseMirror code {
+  background: var(--acc-1);
+  border: 1px solid var(--acc-2);
+  border-radius: 0.375rem;
+  color: var(--acc-5);
+  padding: 0.125rem 0.375rem;
+}
