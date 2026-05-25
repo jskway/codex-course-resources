@@ -43,6 +43,12 @@ export function NoteEditor(props: NoteEditorProps) {
 
   const editor = useEditor({
     content: props.initialContentJson,
+    editorProps: {
+      attributes: {
+        "aria-label": "Note content",
+        role: "textbox",
+      },
+    },
     extensions: [StarterKit],
     immediatelyRender: false,
     onUpdate: ({ editor: currentEditor }) => {

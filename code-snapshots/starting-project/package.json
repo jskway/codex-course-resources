@@ -8,6 +8,10 @@
     "db:migrate": "bun run scripts/migrate.ts up",
     "db:rollback": "bun run scripts/migrate.ts down",
     "start": "bun run --bun next start",
+    "test": "bun run test:unit && bun run test:e2e",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "playwright test",
     "lint": "oxlint",
     "format": "oxfmt"
   },
