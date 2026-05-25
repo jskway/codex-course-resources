@@ -40,6 +40,12 @@ export default async function RootLayout({
                   >
                     Notes
                   </Link>
+                  <Link
+                    className="rounded-md px-3 py-2 text-foreground transition hover:bg-acc-2 focus:outline-none focus:ring-2 focus:ring-acc-3"
+                    href="/notes/new"
+                  >
+                    New note
+                  </Link>
                   <form action={logoutAction}>
                     <button
                       className="rounded-md bg-acc-3 px-3 py-2 text-background transition hover:bg-acc-4 focus:outline-none focus:ring-2 focus:ring-acc-4 focus:ring-offset-2 focus:ring-offset-background"

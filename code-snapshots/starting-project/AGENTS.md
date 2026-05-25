@@ -7,6 +7,7 @@
 - ALWAYS run `bun run format` AFTER you're done with your task and you edited all files that needed editing
 - ALWAYS run unit tests via `bun run test:unit`
 - ALWAYS run e2e tests via `bun run test:e2e`
+- ALWAYS use the Playwright MCP to verify changes that have an impact on the UI or user experience
 
 ## Project Structure & Module Organization
 

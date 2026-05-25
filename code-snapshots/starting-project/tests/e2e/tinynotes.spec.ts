@@ -21,6 +21,17 @@ test("registers, logs out, and logs back in", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Your notes" })).toBeVisible();
   await expect(page.getByText("No notes yet")).toBeVisible();
 
+  const header = page.getByRole("banner");
+  await expect(header.getByRole("link", { name: "New note" })).toHaveAttribute(
+    "href",
+    "/notes/new",
+  );
+  await header.getByRole("link", { name: "New note" }).click();
+  await expect(page).toHaveURL(/\/notes\/new$/);
+  await expect(page.getByRole("heading", { name: "New note" })).toBeVisible();
+  await page.getByRole("link", { exact: true, name: "Notes" }).click();
+  await expect(page).toHaveURL(/\/notes$/);
+
   await logout(page);
   await loginUser(page, email);
 
@@ -77,6 +88,10 @@ test("edits and persists an existing note", async ({ page }) => {
   const noteUrl = await createNote(page, "Draft research notes", "Initial body");
 
   await page.goto(noteUrl);
+  await expect(page.getByRole("link", { name: "Back to notes" })).toHaveAttribute("href", "/notes");
+  await expect(page.getByRole("heading", { name: "Edit Note" })).toBeVisible();
+  await expect(page.getByText("Changes are saved while you type.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Clear" })).toHaveCount(0);
   await page.getByLabel("Note title").fill(updatedTitle);
   await getEditor(page).fill(updatedBody);
   await page.getByRole("button", { name: "Save" }).click();
@@ -89,20 +104,17 @@ test("edits and persists an existing note", async ({ page }) => {
   await expect(getEditor(page)).toContainText(updatedBody);
 });
 
-test("clears a note and persists the untitled state", async ({ page }) => {
+test("clears a note draft while creating a note", async ({ page }) => {
   const email = uniqueEmail("clear-note");
 
   await registerUser(page, email, "Clear Note User");
-  const noteUrl = await createNote(page, "Temporary note", "Temporary body");
-
-  await page.goto(noteUrl);
+  await page.goto("/notes/new");
+  await page.getByLabel("Note title").fill("Temporary note");
+  await getEditor(page).fill("Temporary body");
   await page.getByRole("button", { name: "Clear" }).click();
-  await expect(page.getByLabel("Note title")).toHaveValue("");
-  await page.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByText("Saved")).toBeVisible();
 
-  await page.goto("/notes");
-  await expect(page.getByRole("heading", { name: "Untitled note" })).toBeVisible();
+  await expect(page.getByLabel("Note title")).toHaveValue("");
+  await expect(getEditor(page)).not.toContainText("Temporary body");
 });
 
 test("prevents a different user from opening another user's note", async ({ page }) => {
@@ -150,7 +162,7 @@ async function logout(page: Page): Promise<void> {
 
 async function createNote(page: Page, title: string, body: string): Promise<string> {
   await page.goto("/notes/new");
-  await expect(page.getByText("New note")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "New note" })).toBeVisible();
   await page.getByLabel("Note title").fill(title);
   await getEditor(page).fill(body);
   await page.getByRole("button", { name: "Create note" }).click();

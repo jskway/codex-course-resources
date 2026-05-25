@@ -3,12 +3,12 @@
 import type { Editor, JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { createNoteAction, updateNoteAction } from "./actions";
 import {
   createEmptyTiptapContent,
-  getNoteDisplayTitle,
   normalizeNoteTitle,
   serializeTiptapContent,
 } from "@/lib/note-content";
@@ -157,14 +157,32 @@ export function NoteEditor(props: NoteEditorProps) {
 
   return (
     <section className="mx-auto max-w-4xl">
-      <div className="mb-5">
-        <p className="text-sm font-medium text-foreground/70">
-          {isCreateMode ? "New note" : getNoteDisplayTitle(title)}
-        </p>
-        <p className={`mt-1 text-sm font-semibold ${status.className}`} aria-live="polite">
-          {status.label}
-        </p>
-      </div>
+      {isCreateMode ? (
+        <div className="mb-5">
+          <h1 className="text-3xl font-semibold tracking-tight text-acc-5">New note</h1>
+          <p className={`mt-2 text-sm font-semibold ${status.className}`} aria-live="polite">
+            {status.label}
+          </p>
+        </div>
+      ) : (
+        <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <Link
+              className="inline-flex min-h-10 items-center justify-center rounded-md border border-acc-2 px-4 py-2 text-sm font-semibold text-acc-5 transition hover:border-acc-3 hover:bg-acc-1 focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2 focus:ring-offset-background"
+              href="/notes"
+            >
+              Back to notes
+            </Link>
+            <h1 className="mt-5 text-3xl font-semibold tracking-tight text-acc-5">Edit Note</h1>
+            <p className="mt-2 text-sm leading-6 text-foreground/70">
+              Changes are saved while you type.
+            </p>
+          </div>
+          <p className={`text-sm font-semibold ${status.className}`} aria-live="polite">
+            {status.label}
+          </p>
+        </header>
+      )}
 
       <div className="overflow-hidden rounded-lg border border-acc-2 bg-acc-1/80 shadow-xl shadow-black/10">
         <label className="block border-b border-acc-2 px-4 py-3">
@@ -191,14 +209,16 @@ export function NoteEditor(props: NoteEditorProps) {
       </div>
 
       <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <button
-          className="inline-flex min-h-10 items-center justify-center rounded-md border border-acc-2 px-5 py-2 text-sm font-semibold text-acc-5 transition hover:border-acc-3 hover:bg-acc-1 focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={editor === null || isSaving || isRouting}
-          onClick={handleClearClick}
-          type="button"
-        >
-          Clear
-        </button>
+        {isCreateMode ? (
+          <button
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-acc-2 px-5 py-2 text-sm font-semibold text-acc-5 transition hover:border-acc-3 hover:bg-acc-1 focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={editor === null || isSaving || isRouting}
+            onClick={handleClearClick}
+            type="button"
+          >
+            Clear
+          </button>
+        ) : null}
         <button
           className="inline-flex min-h-10 items-center justify-center rounded-md bg-acc-3 px-5 py-2 text-sm font-semibold text-background shadow-sm transition hover:bg-acc-4 focus:outline-none focus:ring-2 focus:ring-acc-4 focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
           disabled={
