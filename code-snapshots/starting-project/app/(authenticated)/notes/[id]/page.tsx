@@ -22,6 +22,7 @@ export default async function NoteDetailPage({
       initialTitle={note.title}
       mode="edit"
       noteId={note.id}
+      shareEnabled={note.shareEnabled}
     />
   );
 }

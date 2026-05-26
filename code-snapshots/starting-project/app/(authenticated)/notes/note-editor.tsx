@@ -6,7 +6,13 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { createNoteAction, updateNoteAction } from "./actions";
+import {
+  createNoteAction,
+  deleteNoteAction,
+  disableShareAction,
+  enableShareAction,
+  updateNoteAction,
+} from "./actions";
 import {
   createEmptyTiptapContent,
   normalizeNoteTitle,
@@ -24,6 +30,7 @@ type NoteEditorProps =
       initialTitle: string;
       mode: "edit";
       noteId: string;
+      shareEnabled: boolean;
     };
 
 const autosaveDelayMs = 1200;
@@ -37,6 +44,12 @@ export function NoteEditor(props: NoteEditorProps) {
   const [savedKey, setSavedKey] = useState(initialSavedKey);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareEnabled, setShareEnabled] = useState(
+    props.mode === "edit" ? props.shareEnabled : false,
+  );
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [isRouting, startRouting] = useTransition();
   const latestTitleRef = useRef(props.initialTitle);
   const latestContentKeyRef = useRef(initialContentKey);
@@ -144,6 +157,50 @@ export function NoteEditor(props: NoteEditorProps) {
     void saveNote();
   }
 
+  async function handleDeleteClick() {
+    if (props.mode !== "edit" || isDeleting || isSaving || isRouting) return;
+    if (!window.confirm("Delete this note? This action cannot be undone.")) return;
+    setIsDeleting(true);
+    setErrorMessage(null);
+    const result = await deleteNoteAction({ id: props.noteId });
+    setIsDeleting(false);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
+    startRouting(() => {
+      router.replace("/notes");
+    });
+  }
+
+  async function handleEnableShareClick() {
+    if (props.mode !== "edit" || isSharing) return;
+    setIsSharing(true);
+    setErrorMessage(null);
+    const result = await enableShareAction({ id: props.noteId });
+    setIsSharing(false);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
+    setShareEnabled(true);
+    setShareUrl(result.share.shareUrl);
+  }
+
+  async function handleDisableShareClick() {
+    if (props.mode !== "edit" || isSharing) return;
+    setIsSharing(true);
+    setErrorMessage(null);
+    const result = await disableShareAction({ id: props.noteId });
+    setIsSharing(false);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
+    setShareEnabled(false);
+    setShareUrl(null);
+  }
+
   function handleClearClick() {
     const emptyContent = createEmptyTiptapContent();
 
@@ -208,7 +265,51 @@ export function NoteEditor(props: NoteEditorProps) {
         </div>
       </div>
 
+      {props.mode === "edit" ? (
+        <div className="mt-5 rounded-lg border border-acc-2 bg-acc-1 p-4">
+          <p className="text-sm font-semibold text-acc-5">Public sharing</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {shareEnabled ? (
+              <button
+                className="inline-flex min-h-10 items-center justify-center rounded-md border border-acc-2 px-4 py-2 text-sm font-semibold text-acc-5"
+                disabled={isSharing}
+                onClick={handleDisableShareClick}
+                type="button"
+              >
+                Disable sharing
+              </button>
+            ) : (
+              <button
+                className="inline-flex min-h-10 items-center justify-center rounded-md border border-acc-2 px-4 py-2 text-sm font-semibold text-acc-5"
+                disabled={isSharing}
+                onClick={handleEnableShareClick}
+                type="button"
+              >
+                Enable sharing
+              </button>
+            )}
+            {shareUrl !== null ? (
+              <input
+                className="min-w-0 flex-1 rounded-md border border-acc-2 bg-background px-3 py-2 text-sm"
+                readOnly
+                value={shareUrl}
+              />
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        {props.mode === "edit" ? (
+          <button
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-red-300 px-5 py-2 text-sm font-semibold text-red-700"
+            disabled={isDeleting || isSaving || isRouting}
+            onClick={handleDeleteClick}
+            type="button"
+          >
+            Delete
+          </button>
+        ) : null}
         {isCreateMode ? (
           <button
             className="inline-flex min-h-10 items-center justify-center rounded-md border border-acc-2 px-5 py-2 text-sm font-semibold text-acc-5 transition hover:border-acc-3 hover:bg-acc-1 focus:outline-none focus:ring-2 focus:ring-acc-2 focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
