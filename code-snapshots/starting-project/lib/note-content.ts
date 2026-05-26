@@ -65,3 +65,81 @@ function isTiptapContent(value: unknown): value is JSONContent {
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+
+export function renderPublicNoteHtml(content: JSONContent): string {
+  return renderNode(content);
+}
+
+function renderNode(node: JSONContent | null | undefined): string {
+  if (!node || typeof node.type !== "string") return "";
+  const children = (node.content ?? []).map((child) => renderNode(child)).join("");
+  switch (node.type) {
+    case "doc":
+      return children;
+    case "paragraph":
+      return `<p>${children}</p>`;
+    case "heading": {
+      const level = Math.min(6, Math.max(1, Number(node.attrs?.level ?? 1)));
+      return `<h${level}>${children}</h${level}>`;
+    }
+    case "bulletList":
+      return `<ul>${children}</ul>`;
+    case "orderedList":
+      return `<ol>${children}</ol>`;
+    case "listItem":
+      return `<li>${children}</li>`;
+    case "blockquote":
+      return `<blockquote>${children}</blockquote>`;
+    case "codeBlock":
+      return `<pre><code>${escapeHtml(textContent(node))}</code></pre>`;
+    case "hardBreak":
+      return "<br />";
+    case "text":
+      return applyMarks(escapeHtml(String(node.text ?? "")), node.marks ?? []);
+    default:
+      return children;
+  }
+}
+
+function applyMarks(
+  text: string,
+  marks: Array<{ type?: string; attrs?: Record<string, unknown> }>,
+): string {
+  return marks.reduce((acc, mark) => {
+    switch (mark.type) {
+      case "bold":
+        return `<strong>${acc}</strong>`;
+      case "italic":
+        return `<em>${acc}</em>`;
+      case "strike":
+        return `<s>${acc}</s>`;
+      case "code":
+        return `<code>${acc}</code>`;
+      case "link": {
+        const href = typeof mark.attrs?.href === "string" ? mark.attrs.href : "";
+        if (!/^https?:\/\//i.test(href)) return acc;
+        return `<a href="${escapeAttribute(href)}" rel="noreferrer noopener" target="_blank">${acc}</a>`;
+      }
+      default:
+        return acc;
+    }
+  }, text);
+}
+
+function textContent(node: JSONContent): string {
+  if (node.type === "text") return String(node.text ?? "");
+  return (node.content ?? []).map((child) => textContent(child)).join("");
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function escapeAttribute(value: string): string {
+  return escapeHtml(value);
+}
